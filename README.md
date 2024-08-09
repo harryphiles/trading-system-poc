@@ -1,4 +1,4 @@
-# Trading System Proof of Concept
+# Trading System as Proof of Concept
 A proof-of-concept trading system that primarily focuses on order matching.
 
 This project simulates a trading environment where orders are created, processed, and matched in a simple order book. It is intended to explore ideas about the design of order processing in a trading system.
@@ -23,7 +23,7 @@ The `OrderProcessor` class handles the reception and processing of orders. It in
 The `OrderQueue` class manages the queue of orders to be processed. It handles adding orders to the queue, updating order books, and managing order cancellations.
 
 ### MatchEngine
-The `MatchEngine` is responsible for matching buy and sell orders and executing trades. A trade occurs when the highest bid on the buy side is equal to or greater than the lowest ask on the sell side.
+The `MatchEngine` class is responsible for matching buy and sell orders and executing trades. A trade occurs when the highest bid on the buy side is equal to or greater than the lowest ask on the sell side.
 
 ## Features
 
