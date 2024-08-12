@@ -34,7 +34,7 @@ class OrderProcessor:
                 order_queue=self.order_queue
             )
             self.transactions += len(matches)
-            self.order_queue.orderbook_size -= num_removed_orders
+            # self.order_queue.orderbook_size -= num_removed_orders
 
             self._log_order_processing_summary()
 
@@ -51,7 +51,7 @@ class OrderProcessor:
                 order_queue=self.order_queue
             )
             self.transactions += len(matches)
-            self.order_queue.orderbook_size -= num_removed_orders
+            # self.order_queue.orderbook_size -= num_removed_orders
 
             self._log_order_processing_summary()
 
