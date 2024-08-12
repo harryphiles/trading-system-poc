@@ -1,6 +1,18 @@
 from collections import deque
+import heapq
 from src.order_components import OrderSide, OrderStatus, Order
 from src.logger import Logger
+
+
+class HeapOrder:
+    def __init__(self, price: float, order: Order) -> None:
+        self.price = price
+        self.order = order
+
+    def __lt__(self, other) -> bool:
+        if self.order.side == OrderSide.BUY:
+            return self.price > other.price
+        return self.price < other.price
 
 
 class OrderQueue:
