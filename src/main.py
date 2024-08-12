@@ -62,26 +62,28 @@ def run_matches_from_given_orders(op: OrderProcessor, orders: int):
     for _ in range(orders):
         op.receive_order(*create_random_order())
     t1 = time.time()
-    print(f"Adding {orders} orders took {t1 - t0}")
+    print(f"Adding {orders:,} orders took {t1 - t0}")
 
     op.process_orders()
     t2 = time.time()
-    print(f"Matching {orders} orders took {t2 - t1}")
+    print(f"Matching {orders:,} orders took {t2 - t1}")
 
 
 def main():
-    logger = Logger(__name__, LOGGING_CONFIG, "test.log").logger
+    # logger = Logger(__name__, LOGGING_CONFIG, "test.log").logger
 
-    oq = OrderQueue(logger=logger)
-    me = MatchEngine(logger=logger)
-    op = OrderProcessor(oq, me, logger=logger)
+    oq = OrderQueue(logger=None)
+    me = MatchEngine(logger=None)
+    op = OrderProcessor(oq, me, logger=None)
 
     # Simulate trading for n seconds
-    simulate_trading(op, oq, duration=10)
-    # run_matches_from_given_orders(op, 10)
-    # run_matches_from_given_orders(op, 100)
-    # run_matches_from_given_orders(op, 1_000)
-    # run_matches_from_given_orders(op, 10_000)
+    # simulate_trading(op, oq, duration=10)
+    run_matches_from_given_orders(op, 10)
+    run_matches_from_given_orders(op, 100)
+    run_matches_from_given_orders(op, 1_000)
+    run_matches_from_given_orders(op, 10_000)
+    run_matches_from_given_orders(op, 100_000)
+    run_matches_from_given_orders(op, 1_000_000)
 
 
 if __name__ == "__main__":
