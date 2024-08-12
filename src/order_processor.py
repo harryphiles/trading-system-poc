@@ -31,9 +31,7 @@ class OrderProcessor:
         order = self.order_queue.get_next_order()
         if order:
             num_removed_orders, matches = self.match_engine.match_orders(
-                buy_orders=self.order_queue.buy_orders,
-                sell_orders=self.order_queue.sell_orders,
-                filled_orders=self.order_queue.filled_orders,
+                order_queue=self.order_queue
             )
             self.transactions += len(matches)
             self.order_queue.orderbook_size -= num_removed_orders
@@ -50,9 +48,7 @@ class OrderProcessor:
             self._log_before_matching()
 
             num_removed_orders, matches = self.match_engine.match_orders(
-                buy_orders=self.order_queue.buy_orders,
-                sell_orders=self.order_queue.sell_orders,
-                filled_orders=self.order_queue.filled_orders,
+                order_queue=self.order_queue
             )
             self.transactions += len(matches)
             self.order_queue.orderbook_size -= num_removed_orders
