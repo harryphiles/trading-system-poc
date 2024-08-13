@@ -16,41 +16,34 @@ class MatchEngine:
             best_sell: Order = order_queue.get_best_sell_order()
 
             # Case for stopping matching process
-            if (
-                not best_buy or not best_sell or
-                best_sell.price > best_buy.price
-            ):
+            if not best_buy or not best_sell or best_sell.price > best_buy.price:
                 break
 
-            buy_order: Order = order_queue.remove_best_buy_order()
-            sell_order: Order = order_queue.remove_best_sell_order()
-
-            matched_quantity = min(buy_order.quantity, sell_order.quantity)
-            matches.append((buy_order, sell_order, sell_order.price, matched_quantity))
+            matched_quantity = min(best_buy.quantity, best_sell.quantity)
+            matches.append((best_buy, best_sell, best_sell.price, matched_quantity))
 
             # Subtract quantity as result of transaction
-            buy_order.quantity -= matched_quantity
-            sell_order.quantity -= matched_quantity
+            best_buy.quantity -= matched_quantity
+            best_sell.quantity -= matched_quantity
             # Mark each as partially_filled as preliminary action
-            buy_order.status = OrderStatus.PARTIALLY_FILLED
-            sell_order.status = OrderStatus.PARTIALLY_FILLED\
+            best_buy.status = OrderStatus.PARTIALLY_FILLED
+            best_sell.status = OrderStatus.PARTIALLY_FILLED
 
-            # Update Order according to its remaining quantity
-            if buy_order.quantity > 0:
-                order_queue.update_orderbooks(buy_order)
-            else:
+            # Remove buy or sell order when their quantities reach zero
+            if best_buy.quantity == 0:
                 num_removed_orders += 1
-                buy_order.status = OrderStatus.FILLED
-                order_queue.filled_orders.append(buy_order)
-
-            if sell_order.quantity > 0:
-                order_queue.update_orderbooks(sell_order)
-            else:
+                best_buy.status = OrderStatus.FILLED
+                order_queue.remove_best_buy_order()
+                order_queue.filled_orders.append(best_buy)
+            if best_sell.quantity == 0:
                 num_removed_orders += 1
-                sell_order.status = OrderStatus.FILLED
-                order_queue.filled_orders.append(sell_order)
+                best_sell.status = OrderStatus.FILLED
+                order_queue.remove_best_sell_order()
+                order_queue.filled_orders.append(best_sell)
 
-            self._log_matched_orders(buy_order, sell_order, matched_quantity, sell_order.price)
+            self._log_matched_orders(
+                best_buy, best_sell, matched_quantity, best_sell.price
+            )
 
         return num_removed_orders, matches
 
