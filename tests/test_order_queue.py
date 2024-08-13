@@ -27,7 +27,8 @@ class TestOrderQueue(unittest.TestCase):
         self.assertEqual(next_order.status, OrderStatus.PROCESSING)
         self.assertEqual(len(self.order_queue.queue), 1)
         self.assertEqual(self.order_queue.orderbook_size, 1)
-        self.assertIn(100, self.order_queue.buy_orders)
+        order_in_heap = [od.order for od in self.order_queue.buy_orders]
+        self.assertIn(order1, order_in_heap)
 
     def test_cancel_pending_order(self):
         order = Order(100, OrderSide.BUY, 10, 5)
@@ -60,20 +61,82 @@ class TestOrderQueue(unittest.TestCase):
         self.order_queue.get_next_order()
         self.order_queue.get_next_order()
 
-        self.assertIn(100, self.order_queue.buy_orders)
-        self.assertIn(101, self.order_queue.sell_orders)
+        buy_orders = [od.order for od in self.order_queue.buy_orders]
+        sell_orders = [od.order for od in self.order_queue.sell_orders]
+
+        self.assertIn(buy_order, buy_orders)
+        self.assertIn(sell_order, sell_orders)
         self.assertEqual(self.order_queue.orderbook_size, 2)
 
     def test_empty_queue(self):
         self.assertIsNone(self.order_queue.get_next_order())
 
-    def test_cancel_last_order_at_price(self):
-        order = Order(100, OrderSide.BUY, 10, 5)
-        self.order_queue.add_order(order)
-        self.order_queue.get_next_order()
-        self.order_queue.cancel_order(order.order_id)
-        self.assertNotIn(100, self.order_queue.buy_orders)
+    def test_get_best_buy_order(self):
+        order1 = Order(1, OrderSide.BUY, 100, 5)
+        order2 = Order(2, OrderSide.BUY, 101, 5)
+        
+        self.order_queue.add_order(order1)
+        self.order_queue.add_order(order2)
 
+        self.order_queue.get_next_order()
+        self.order_queue.get_next_order()
+
+        best_buy: Order = self.order_queue.get_best_buy_order()
+        
+        self.assertEqual(101, best_buy.price)
+        self.assertEqual(order2, best_buy)
+
+    def test_get_best_sell_order(self):
+        order1 = Order(1, OrderSide.SELL, 100, 5)
+        order2 = Order(2, OrderSide.SELL, 101, 5)
+        
+        self.order_queue.add_order(order1)
+        self.order_queue.add_order(order2)
+
+        self.order_queue.get_next_order()
+        self.order_queue.get_next_order()
+
+        best_sell: Order = self.order_queue.get_best_sell_order()
+        
+        self.assertEqual(100, best_sell.price)
+        self.assertEqual(order1, best_sell)
+
+    def test_remove_best_buy_order(self):
+        order1 = Order(1, OrderSide.BUY, 100, 5)
+        order2 = Order(2, OrderSide.BUY, 101, 5)
+        
+        self.order_queue.add_order(order1)
+        self.order_queue.add_order(order2)
+
+        self.order_queue.get_next_order()
+        self.order_queue.get_next_order()
+        
+        best_buy: Order = self.order_queue.remove_best_buy_order()
+
+        buy_orders = [od.order for od in self.order_queue.buy_orders]
+        self.assertEqual(1, self.order_queue.orderbook_size)
+        self.assertNotIn(order2, buy_orders)
+        self.assertEqual(101, best_buy.price)
+        self.assertEqual(order2, best_buy)
+
+    def test_remove_best_sell_order(self):
+        order1 = Order(1, OrderSide.SELL, 100, 5)
+        order2 = Order(2, OrderSide.SELL, 101, 5)
+        
+        self.order_queue.add_order(order1)
+        self.order_queue.add_order(order2)
+
+        self.order_queue.get_next_order()
+        self.order_queue.get_next_order()
+        
+        best_sell: Order = self.order_queue.remove_best_sell_order()
+
+        sell_orders = [od.order for od in self.order_queue.sell_orders]
+        self.assertEqual(1, self.order_queue.orderbook_size)
+        self.assertNotIn(order1, sell_orders)
+        self.assertEqual(100, best_sell.price)
+        self.assertEqual(order1, best_sell)
+    
 
 if __name__ == "__main__":
     unittest.main()
