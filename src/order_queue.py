@@ -5,13 +5,17 @@ from src.logger import Logger
 
 
 class HeapOrder:
+    """
+    __lt__ ensures correct ordering in heap data structure.
+    min-heap: set price as it is.
+    max-heap: negate the price to mimic max-heap in min-heap structure.
+    """
+
     def __init__(self, price: float, order: Order) -> None:
         self.price = price
         self.order = order
 
     def __lt__(self, other) -> bool:
-        if self.order.side == OrderSide.BUY:
-            return self.price > other.price
         return self.price < other.price
 
 
